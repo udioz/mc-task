@@ -14,36 +14,38 @@ mycursor = mydb.cursor()
 
 def lambda_handler(event, context):
     response = requests.get('https://api.cryptowat.ch/markets/prices');
-    results = response.json()['result']
-    
-    for key in results:
-        process_result(key, results[key])
+    process_results(response.json()['result'])
 
     return {
-        'statusCode': 200,
+        'statusCode': response.status_code,
         'body': json.dumps('Hello from Lambda!')
     }
 
 def process_results(results):
-    query = 'insert into rawQuotes (exchange, pair, price) values '
-    for key in results:
-        process_result(key, results[key])
-
-def process_result(key, value):
-    print(key, value)
-    if key.split(':')[0] != 'market':
-        return
-
-    exchange = key.split(':')[1]
-    pair = key.split(':')[2]
-
-    sql = "INSERT INTO rawQuotes (exchange, pair, price) VALUES (%s, %s, %s)"
-    val = [exchange, pair, value]
-    mycursor.execute(sql, val)
-
+    query = build_query(results)
+    print(query)
+    mycursor.execute(query)
     mydb.commit()
 
-    print(mycursor.rowcount, "record inserted.")
-    
 
-print(lambda_handler({},{}))
+def build_query(results):
+    query = 'insert into rawQuotes (exchange, pair, price) values '
+    for key in results:
+        values = process_result(key, results[key])
+        query = query + '("%s", "%s", %s),'%(values['exchange'], values['pair'], values['price'])
+    query = query[:-1]
+    return query
+
+
+def process_result(priceEntity, price):
+    print(priceEntity, price)
+    if priceEntity.split(':')[0] != 'market':
+        return
+
+    return {
+        'exchange': priceEntity.split(':')[1],
+        'pair': priceEntity.split(':')[2],
+        'price': price
+    }    
+
+lambda_handler({},{})
