@@ -24,7 +24,7 @@ def lambda_handler(event, context):
 def get_pair_quotes(pair, exchange = DEFAULT_EXCHANGE):
   query = '''
     select exchange, pair, price
-    from rawQuotes
+    from quotes
     where exchange = '%s'
     and pair = '%s'
     and createdAt > now() - interval 24 hour
@@ -36,7 +36,7 @@ def get_pair_quotes(pair, exchange = DEFAULT_EXCHANGE):
 def get_pair_rank(pair, exchange = DEFAULT_EXCHANGE):
   query = '''
     select rank 
-    from quoteRanks
+    from ranks
     where exchange = '%s'
     and pair = '%s' 
   '''%(exchange, pair)
