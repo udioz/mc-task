@@ -1,6 +1,4 @@
-from email.policy import default
 import json
-from unittest.mock import DEFAULT
 import mysql.connector
 import statistics
 
@@ -37,7 +35,7 @@ def lambda_handler(event, context):
 def get_exchange_pairs(exchange = DEFAULT_EXCHANGE):
     query = '''
         select distinct pair 
-        from rawQuotes 
+        from quotes 
         where exchange = "%s" 
         and createdAt > now() - interval 24 hour
     '''%exchange
@@ -47,7 +45,7 @@ def get_exchange_pairs(exchange = DEFAULT_EXCHANGE):
 def get_pair_prices(pair, exchange = DEFAULT_EXCHANGE):
     query = '''
         select price 
-        from rawQuotes 
+        from quotes 
         where exchange = '%s' 
         and pair = '%s'
         and createdAt > now() - interval 24 hour
@@ -57,7 +55,7 @@ def get_pair_prices(pair, exchange = DEFAULT_EXCHANGE):
 
 def upsert_pair_stdev(pair, stdev, exchange = DEFAULT_EXCHANGE):
     query = '''
-        insert into quoteRanks (
+        insert into ranks (
         exchange, pair, standardDeviation) 
         values ('%s','%s', %s) 
         on duplicate key update 
@@ -71,7 +69,7 @@ def calc_rank(exchange = DEFAULT_EXCHANGE):
     cursor.execute(query)
     
     query = '''
-        update quoteRanks
+        update ranks
         set rank = @r:= (@r+1) 
         where exchange = '%s'
         order by standardDeviation desc
