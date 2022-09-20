@@ -19,6 +19,7 @@ except mysql.connector.Error as error:
 
 def lambda_handler(event, context):    
     results = get_exchange_pairs()
+    pair_stdev = []
     for pair_record in results:
         pair = pair_record.get('pair')
         pair_prices = get_pair_prices(pair)
@@ -26,8 +27,13 @@ def lambda_handler(event, context):
         prices = []
         for price in pair_prices:
             prices.append(price.get('price'))
+        
+        pair_stdev.append({
+            'pair': pair,
+            'stdev': statistics.stdev(prices)
+        })
 
-        upsert_pair_stdev(pair,statistics.stdev(prices))
+    upsert_pair_stdev(pair_stdev)
     calc_rank()
     return {
         'statusCode': 200,
@@ -39,6 +45,7 @@ def get_exchange_pairs(exchange = DEFAULT_EXCHANGE):
         from quotes 
         where exchange = "%s" 
         and createdAt > now() - interval 24 hour
+        limit 5
     '''%exchange
     cursor.execute(query)
     return cursor.fetchall()
@@ -54,26 +61,30 @@ def get_pair_prices(pair, exchange = DEFAULT_EXCHANGE):
     cursor.execute(query)
     return cursor.fetchall()
 
-def upsert_pair_stdev(pair, stdev, exchange = DEFAULT_EXCHANGE):
+def upsert_pair_stdev(pair_stdev, exchange = DEFAULT_EXCHANGE):
     query = '''
         insert into ranks 
-        (exchange, pair, standardDeviation) 
-        values ('%s','%s', %s) 
+        (exchange, pair, standardDeviation) values 
+    '''
+
+    for item in pair_stdev:        
+        query += '''('%s','%s', %s),'''%(exchange,item.get('pair'),item.get('stdev'))
+    
+    query = query[:-1]
+    query += '''
         on duplicate key update 
-        standardDeviation = %s
-    '''%(exchange,pair,stdev,stdev)
+        standardDeviation = values(standardDeviation)
+    '''
     cursor.execute(query)
     return db.commit()
 
 def calc_rank():
-    print('in calc_rank')
     query = '''
         update ranks as r
         join (select exchange,pair,dense_rank() OVER ( partition by exchange order by standardDeviation desc) as 'dense_rank' from ranks) as rr
         on r.exchange = rr.exchange and r.pair = rr.pair
         set r.the_rank = rr.dense_rank
     '''
-    print(query)
     cursor.execute(query)
     db.commit()
 

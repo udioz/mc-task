@@ -1,24 +1,28 @@
+import os
 import mysql.connector
 
 DEFAULT_EXCHANGE = 'kraken'
 
-db = mysql.connector.connect(
-  host='localhost',
-  user='root',
-  password='password',
-  database='mc-nest'
-)
+try:
+    db = mysql.connector.connect(
+        host = os.environ.get('DB_HOST','localhost'),
+        user = os.environ.get('DB_USER','root'),
+        password = os.environ.get('DB_PASSWORD','password'),
+        database = os.environ.get('DB_DATABASE','mc-nest')
+    )
 
-cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(dictionary=True)
+except mysql.connector.Error as error:
+    print(error)
+
 
 def lambda_handler(event, context):
-    pair = event['pair']
+    pair = event['queryStringParameters']['pair']
     quotes = get_pair_quotes(pair)
     rank = get_pair_rank(pair)
-    print(rank, quotes)
     return {
         'statusCode': 200,
-        'body': quotes
+        'body': { 'quotes' : quotes, 'rank': rank }
     }
 
 def get_pair_quotes(pair, exchange = DEFAULT_EXCHANGE):
@@ -35,7 +39,7 @@ def get_pair_quotes(pair, exchange = DEFAULT_EXCHANGE):
 
 def get_pair_rank(pair, exchange = DEFAULT_EXCHANGE):
   query = '''
-    select rank 
+    select the_rank 
     from ranks
     where exchange = '%s'
     and pair = '%s' 
