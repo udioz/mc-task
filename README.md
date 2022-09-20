@@ -18,6 +18,19 @@ The system uses a MySQL database which has 2 tables:
 2. ranks - storing ranks
 
 ## Installation
+Create the following AWS components:
+1. VPC - subnets, route tables, NAT gateway, security groups
+2. Lambda for each component
+3. Lambda layers for dependencies
+
+
+Create Lambda layers for requests and mysql-connector-python packages
+Create a Lambda function for each component
+Upload deployment zip files
+Attach layers to each lambda
+Add env vars 
+https://aws.amazon.com/premiumsupport/knowledge-center/connect-lambda-to-an-rds-instance/
+
 
 
 ## Future features

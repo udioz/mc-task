@@ -1,17 +1,21 @@
-import json
+import os
 import mysql.connector
 import statistics
 
 DEFAULT_EXCHANGE = 'kraken'
 
-db = mysql.connector.connect(
-  host='localhost',
-  user='root',
-  password='password',
-  database='mc-nest'
-)
+try:
+    db = mysql.connector.connect(
+        host = os.environ.get('DB_HOST','localhost'),
+        user = os.environ.get('DB_USER','root'),
+        password = os.environ.get('DB_PASSWORD','password'),
+        database = os.environ.get('DB_DATABASE','mc-nest')
+    )
 
-cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(dictionary=True)
+except mysql.connector.Error as error:
+    print(error)
+
 
 def lambda_handler(event, context):    
     results = get_exchange_pairs()
@@ -24,12 +28,9 @@ def lambda_handler(event, context):
             prices.append(price.get('price'))
 
         upsert_pair_stdev(pair,statistics.stdev(prices))
-        
     calc_rank()
-
     return {
         'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!')
     }
 
 def get_exchange_pairs(exchange = DEFAULT_EXCHANGE):
@@ -55,25 +56,24 @@ def get_pair_prices(pair, exchange = DEFAULT_EXCHANGE):
 
 def upsert_pair_stdev(pair, stdev, exchange = DEFAULT_EXCHANGE):
     query = '''
-        insert into ranks (
-        exchange, pair, standardDeviation) 
+        insert into ranks 
+        (exchange, pair, standardDeviation) 
         values ('%s','%s', %s) 
         on duplicate key update 
         standardDeviation = %s
     '''%(exchange,pair,stdev,stdev)
     cursor.execute(query)
-    db.commit()
+    return db.commit()
 
-def calc_rank(exchange = DEFAULT_EXCHANGE):
-    query = 'SET @r=0'
-    cursor.execute(query)
-    
+def calc_rank():
+    print('in calc_rank')
     query = '''
-        update ranks
-        set rank = @r:= (@r+1) 
-        where exchange = '%s'
-        order by standardDeviation desc
-    '''%exchange
+        update ranks as r
+        join (select exchange,pair,dense_rank() OVER ( partition by exchange order by standardDeviation desc) as 'dense_rank' from ranks) as rr
+        on r.exchange = rr.exchange and r.pair = rr.pair
+        set r.the_rank = rr.dense_rank
+    '''
+    print(query)
     cursor.execute(query)
     db.commit()
 
