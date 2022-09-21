@@ -12,7 +12,7 @@ An API for developers to get last 24 hour quotes of a pair
 
 # Architecture
 To support scalability and simplicity all components were written as an AWS Lambda.
-![Architecture](https://www.dropbox.com/s/shwiawew5ax027v/MC.jpg?dl=0)
+![Arc](MC.jpg)
 
 The system uses a MySQL database which has 2 tables:
 1. quotes - an append only table for storing quote data
@@ -95,12 +95,12 @@ Create the following AWS components:
 - add stress tests
 
 ##  Feature request - real time alerts
-#### The short version - 
+### <u>The short version</u>
 Another lambda that listens to new data and checks if the last quote is greater than 3x last hour average.
 I think that if this is the direction we are heading to I would split Ranker to 2 services:
 1. Stats - calc stats on data (standard deviation, average, p90, p99 etc.)
 2. Ranker - Set a rank to each currency
 3. Real time alerts that can check new data against pre computed stats and if it meets a condition like 3x greater than - send an alert (via a notification service)
 
-#### The long version - 
+### <u>The long version</u>
 Basically the same only with a more rich featured alerts system where you can define and manage alerts in a more organized way.
