@@ -1,4 +1,3 @@
-from operator import truediv
 import unittest
 import requests
 import mysql.connector
@@ -28,7 +27,7 @@ EXTERNAL_API_RESPONSE = {
 }
 
 class MockCursor():
-    def execute():
+    def execute(query):
         return True
 
 class MockDB():
