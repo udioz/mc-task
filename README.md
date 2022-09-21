@@ -1,9 +1,8 @@
 # Cryptocurrency Quotes
 
-The project is comprised of 3 parts:
-
+The project is divided into three parts: 
 ### 1. Collector
-The collector periodically (every minute) samples an API to get the most recent Cryptocurrency quotes and then save these quotes in a database.
+Collector periodically (every minute) samples an API to get the most recent Cryptocurrency quotes and then save these quotes in a database.
 
 ### 2. Ranker
 Runs as a result of new quote samples and recalculates quote ranks relative to other markets in the same exchange
@@ -17,7 +16,41 @@ To support scalability and simplicity all components were written as an AWS Lamb
 
 The system uses a MySQL database which has 2 tables:
 1. quotes - an append only table for storing quote data
+```
+CREATE TABLE `quotes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `exchange` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `pair` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `price` decimal(35,10) NOT NULL,
+  `batch_id` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `modified_at` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`),
+  KEY (`exchange`),
+  KEY (`pair`),
+  KEY (`batch_id`),
+  KEY (`created_at`),
+  KEY (`modified_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+```
 2. ranks - storing ranks per exchange + pair
+```
+CREATE TABLE `ranks` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `exchange` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `pair` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `the_rank` int DEFAULT NULL,
+  `standard_deviation` decimal(35,10) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `modified_at` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`exchange`,`pair`),
+  KEY (`exchange`),
+  KEY (`pair`),
+  KEY (`created_at`),
+  KEY (`modified_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+```
 
 ## Installation
 Create the following AWS components:
@@ -60,3 +93,14 @@ Create the following AWS components:
 - add negative scenarios
 - add integration tests
 - add stress tests
+
+##  Feature request - real time alerts
+#### The short version - 
+Another lambda that listens to new data and checks if the last quote is greater than 3x last hour average.
+I think that if this is the direction we are heading to I would split Ranker to 2 services:
+1. Stats - calc stats on data (standard deviation, average, p90, p99 etc.)
+2. Ranker - Set a rank to each currency
+3. Real time alerts that can check new data against pre computed stats and if it meets a condition like 3x greater than - send an alert (via a notification service)
+
+#### The long version - 
+Basically the same only with a more rich featured alerts system where you can define and manage alerts in a more organized way.
