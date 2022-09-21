@@ -12,7 +12,7 @@ An API for developers to get last 24 hour quotes of a pair
 
 # Architecture
 To support scalability and simplicity all components were written as an AWS Lambda.
-![Architecture](https://drive.google.com/file/d/1pagqS-NCGNU0BVMmuyAf-vU77l9avxYx/view)
+![Architecture](https://www.dropbox.com/s/shwiawew5ax027v/MC.jpg?dl=0)
 
 The system uses a MySQL database which has 2 tables:
 1. quotes - an append only table for storing quote data
