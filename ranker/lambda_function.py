@@ -16,7 +16,6 @@ try:
 except mysql.connector.Error as error:
     print(error)
 
-
 def lambda_handler(event, context):    
     results = get_exchange_pairs()
     pair_stdev = []
@@ -64,7 +63,7 @@ def get_pair_prices(pair, exchange = DEFAULT_EXCHANGE):
 def upsert_pair_stdev(pair_stdev, exchange = DEFAULT_EXCHANGE):
     query = '''
         insert into ranks 
-        (exchange, pair, standardDeviation) values 
+        (exchange, pair, standard_deviation) values 
     '''
 
     for item in pair_stdev:        
@@ -73,7 +72,7 @@ def upsert_pair_stdev(pair_stdev, exchange = DEFAULT_EXCHANGE):
     query = query[:-1]
     query += '''
         on duplicate key update 
-        standardDeviation = values(standardDeviation)
+        standard_deviation = values(standard_deviation)
     '''
     cursor.execute(query)
     return db.commit()
@@ -81,7 +80,7 @@ def upsert_pair_stdev(pair_stdev, exchange = DEFAULT_EXCHANGE):
 def calc_rank():
     query = '''
         update ranks as r
-        join (select exchange,pair,dense_rank() OVER ( partition by exchange order by standardDeviation desc) as 'dense_rank' from ranks) as rr
+        join (select exchange,pair,dense_rank() OVER ( partition by exchange order by standard_deviation desc) as 'dense_rank' from ranks) as rr
         on r.exchange = rr.exchange and r.pair = rr.pair
         set r.the_rank = rr.dense_rank
     '''

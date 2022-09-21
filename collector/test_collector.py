@@ -3,8 +3,7 @@ import requests
 import mysql.connector
 from unittest.mock import MagicMock
 
-from lambda_function import lambda_handler
-
+import lambda_function
 
 EXTERNAL_API_RESPONSE = {
   "result": {
@@ -44,17 +43,14 @@ class TestCollector(unittest.TestCase):
         return super().setUp()
 
     def test_get_market_prices(self):
-        from lambda_function import get_market_prices
-        response = get_market_prices()
+        response = lambda_function.get_market_prices()
         self.assertEqual(response, EXTERNAL_API_RESPONSE)
 
-    def test_save_results(self):
-        from lambda_function import save_results
-        response = save_results(EXTERNAL_API_RESPONSE['result'])
+    def test_save_results(self):        
+        response = lambda_function.save_results(EXTERNAL_API_RESPONSE['result'])
         self.assertTrue(response)
 
     def test_build_query(self):
-        import lambda_function        
         lambda_function.process_result = MagicMock(return_value = {
             'exchange': 'exchange',
             'pair': 'pair',
@@ -65,8 +61,7 @@ class TestCollector(unittest.TestCase):
         self.assertEqual(response.count('''('exchange', 'pair', 1)'''), len(EXTERNAL_API_RESPONSE['result']))
 
     def test_process_result(self):
-        from lambda_function import process_result
-        response = process_result('market:binance-us:1inchusd', 0.1)
+        response = lambda_function.process_result('market:binance-us:1inchusd', 0.1)
         print(response)
 
 
