@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  collector:
+    build:
+      context: './collector'
+    container_name: collector
+    restart: always
+    stdin_open: true
+    tty: true
+    environment:
+      - DB_HOST=mc-db
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_DATABASE=mc_task
+    ports:
+      - '9001:8080'
+    volumes:
+      - ./collector/lambda_function.py:/var/task/lambda_function.py
+    depends_on:
+      - mc-db
+
+  ranker:
+    build:
+      context: './ranker'
+    container_name: ranker
+    restart: always
+    stdin_open: true
+    tty: true
+    environment:
+      - DB_HOST=mc-db
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_DATABASE=mc_task
+    ports:
+      - '9002:8080'
+    volumes:
+      - ./ranker/lambda_function.py:/var/task/lambda_function.py
+    depends_on:
+      - mc-db
+
+  quoter:
+    build:
+      context: './quoter'
+    container_name: quoter
+    restart: always
+    stdin_open: true
+    tty: true
+    environment:
+      - DB_HOST=mc-db
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_DATABASE=mc_task
+    ports:
+      - '9000:8080'
+    volumes:
+      - ./quoter/lambda_function.py:/var/task/lambda_function.py
+    depends_on:
+      - mc-db
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    depends_on:
+      - mc-db
+    ports:
+      - '${ADMINER_PORT:-8080}:8080'
+
+  mc-db:
+    image: mysql:8.0.30
+    container_name: mc-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: mc_task
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - mc_dbdata:/var/lib/mysql
+    ports:
+      - '${DB_PORT:-3306}:3306'
+    command:
+      [
+        '--default-authentication-plugin=mysql_native_password',
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci',
+        '--max_allowed_packet=100M',
+      ]
+volumes:
+  mc_dbdata:

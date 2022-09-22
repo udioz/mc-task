@@ -22,6 +22,8 @@ def lambda_handler(event, context):
     for pair_record in results:
         pair = pair_record.get('pair')
         pair_prices = get_pair_prices(pair)
+        if (len(pair_prices) < 2):
+            continue
 
         prices = []
         for price in pair_prices:
@@ -43,7 +45,7 @@ def get_exchange_pairs(exchange = DEFAULT_EXCHANGE):
         select distinct pair 
         from quotes 
         where exchange = "%s" 
-        and createdAt > now() - interval 24 hour
+        and created_at > now() - interval 24 hour
         limit 5
     '''%exchange
     cursor.execute(query)
@@ -55,7 +57,7 @@ def get_pair_prices(pair, exchange = DEFAULT_EXCHANGE):
         from quotes 
         where exchange = '%s' 
         and pair = '%s'
-        and createdAt > now() - interval 24 hour
+        and created_at > now() - interval 24 hour
     '''%(exchange,pair)
     cursor.execute(query)
     return cursor.fetchall()
