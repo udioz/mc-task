@@ -31,7 +31,7 @@ def get_pair_quotes(pair, exchange = DEFAULT_EXCHANGE):
     from quotes
     where exchange = '%s'
     and pair = '%s'
-    and createdAt > now() - interval 24 hour
+    and created_at > now() - interval 24 hour
   '''%(exchange, pair)
 
   cursor.execute(query)
@@ -46,5 +46,3 @@ def get_pair_rank(pair, exchange = DEFAULT_EXCHANGE):
   '''%(exchange, pair)
   cursor.execute(query)
   return cursor.fetchone()
-
-lambda_handler({ 'pair': 'btcusd' },{})

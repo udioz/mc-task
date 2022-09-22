@@ -53,7 +53,7 @@ CREATE TABLE `ranks` (
 ```
 
 ## Installation
-Create the following AWS components:
+Create the following AWS components (TODO: should be provisioned via Terraform):
 - VPC - public and private subnets
 - Private subnets should use a route table with a NAT gateway
 - Security groups so [Lambda can connect to RDS](https://aws.amazon.com/premiumsupport/knowledge-center/connect-lambda-to-an-rds-instance/)
@@ -64,9 +64,11 @@ Create the following AWS components:
 - For Ranker use a SNS or a step machine so once new data is generated Ranker will be invoked
 
 ## TODO
+- Local dev env: [LocalStack](https://localstack.cloud/)
+- Production/Staging: Terraform to provision all AWS components (Can be used also locally with LocalStack)
+- CICD pipeline
 - Improve error handling and logging
 - Add validation
-- Terraform to provision all AWS components
 - DB connection pooling
 - [Enhance testing](#testing)
 - Use ORM to abstract data models
@@ -78,21 +80,21 @@ Create the following AWS components:
 
 ## Scaling
 - What would you change if you needed to track many metrics?
-    * I'd use a message queue to store the results and save to DB in a more controlled pace
-    * If needed I'd add a read replica to the DB so the writer node is read free
+    * The results would be sent to a message queue, then saved to DB at a more controlled rate 
+    * If needed I'd add a read replica to the DB so the writer node remains read free
 
 - What if you needed to sample them more frequently?
-    * Same answer as before. We get more data we can simply enqueue it and deal with it "later"
+    * Same answer as before. We get more data so we can simply enqueue it and deal with it "later"
     
 - What if you had many users accessing your dashboard to view metrics?
     * if same requests are recurring I can add a cache layer before the DB; If not it will not add any significant value
     * Add a read replica
-    * Switch to a distributed no-sql DB such as DynamoDB
+    * Considering to switch to a distributed no-sql DB such as DynamoDB
 
 ## Testing
-- add negative scenarios
-- add integration tests
-- add stress tests
+- Add negative scenarios
+- Add integration tests
+- Add stress tests
 
 ##  Feature request - real time alerts
 ### <u>The short version</u>
@@ -100,7 +102,10 @@ Another lambda that listens to new data and checks if the last quote is greater 
 I think that if this is the direction we are heading to I would split Ranker to 2 services:
 1. Stats - calc stats on data (standard deviation, average, p90, p99 etc.)
 2. Ranker - Set a rank to each currency
-3. Real time alerts that can check new data against pre computed stats and if it meets a condition like 3x greater than - send an alert (via a notification service)
+
+Then I'll add a third one:
+
+3. Real time alerts that can check new data against pre computed stats and if it meets a certain condition such as "3x greater than" - send an alert (via a separate notification service)
 
 ### <u>The long version</u>
 Basically the same only with a more rich featured alerts system where you can define and manage alerts in a more organized way.
