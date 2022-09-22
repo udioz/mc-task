@@ -1,6 +1,6 @@
 # Cryptocurrency Quotes
 
-The project is divided into three parts: 
+The project is divided into three components: 
 ### 1. Collector
 Collector periodically (every minute) samples an API to get the most recent Cryptocurrency quotes and then save these quotes in a database.
 
@@ -12,7 +12,7 @@ An API for developers to get last 24 hour quotes of a pair
 
 # Architecture
 To support scalability and simplicity all components were written as an AWS Lambda.
-![Arc](./images/MC.jpg)
+![Arc](./images/mc.jpg)
 
 The system uses a MySQL database which has 2 tables:
 1. quotes - an append only table for storing quote data
@@ -122,6 +122,8 @@ I think that if this is the direction we are heading to I would split Ranker to 
 Then I'll add a third one:
 
 3. Real time alerts that can check new data against pre computed stats and if it meets a certain condition such as "3x greater than" - send an alert (via a separate notification service)
+
+![Enhanced](/images/mc-enhanced.png)
 
 ### <u>The long version</u>
 Basically the same only with a more rich featured alerts system where you can define and manage alerts in a more organized way.
