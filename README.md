@@ -53,6 +53,22 @@ CREATE TABLE `ranks` (
 ```
 
 ## Installation
+Local:<br/>
+```
+git clone git@github.com:udioz/mc-task.git && cd mc_task
+
+docker-compose up
+
+# running collector
+curl -XPOST "http://localhost:9001/2015-03-31/functions/function/invocations" -d '{}'
+
+# running ranker
+curl -XPOST "http://localhost:9002/2015-03-31/functions/function/invocations" -d '{}'
+
+# running quoter
+curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"queryStringParameters": { "pair": "btcusd" }}'
+```
+Production/Staging:<br/>
 Create the following AWS components (TODO: should be provisioned via Terraform):
 - VPC - public and private subnets
 - Private subnets should use a route table with a NAT gateway
