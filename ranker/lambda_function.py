@@ -46,7 +46,6 @@ def get_exchange_pairs(exchange = DEFAULT_EXCHANGE):
         from quotes 
         where exchange = "%s" 
         and created_at > now() - interval 24 hour
-        limit 5
     '''%exchange
     cursor.execute(query)
     return cursor.fetchall()

@@ -12,7 +12,7 @@ An API for developers to get last 24 hour quotes of a pair
 
 # Architecture
 To support scalability and simplicity all components were written as an AWS Lambda.
-![Arc](MC.jpg)
+![Arc](./images/MC.jpg)
 
 The system uses a MySQL database which has 2 tables:
 1. quotes - an append only table for storing quote data

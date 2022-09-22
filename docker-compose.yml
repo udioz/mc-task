@@ -71,6 +71,8 @@ services:
     image: mysql:8.0.30
     container_name: mc-db
     restart: always
+    stdin_open: true
+    tty: true
     environment:
       MYSQL_DATABASE: mc_task
       MYSQL_USER: admin
@@ -78,6 +80,7 @@ services:
       MYSQL_ROOT_PASSWORD: password
     volumes:
       - mc_dbdata:/var/lib/mysql
+      - ./db-scripts:/docker-entrypoint-initdb.d
     ports:
       - '${DB_PORT:-3306}:3306'
     command:
