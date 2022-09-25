@@ -28,9 +28,9 @@ class TestRanker(unittest.TestCase):
         print(response)
         # self.assertEqual(response, [])
 
-    # def test_get_pair_prices(self):
-    #     response = lambda_function.get_pair_prices(PAIR)
-    #     self.assertEqual(response, [])
+    def test_get_pair_prices(self):
+        response = lambda_function.get_pair_prices(PAIR)
+        self.assertEqual(response, [])
 
 
 if __name__ == '__main__':

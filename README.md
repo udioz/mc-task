@@ -104,7 +104,7 @@ Create the following AWS components (TODO: should be provisioned via Terraform):
     
 - What if you had many users accessing your dashboard to view metrics?
     * if same requests are recurring I can add a cache layer before the DB; If not it will not add any significant value
-    * Add a read replica
+    * Add one or more read replica
     * Considering to switch to a distributed no-sql DB such as DynamoDB
 
 ## Testing
