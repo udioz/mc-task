@@ -59,7 +59,7 @@ git clone git@github.com:udioz/mc-task.git && cd mc_task
 
 docker-compose up
 
-# running collector
+# running collector. On first time it is recommended to run at least twice before running ranker
 curl -XPOST "http://localhost:9001/2015-03-31/functions/function/invocations" -d '{}'
 
 # running ranker
