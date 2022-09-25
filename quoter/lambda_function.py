@@ -5,10 +5,10 @@ DEFAULT_EXCHANGE = 'kraken'
 
 try:
     db = mysql.connector.connect(
-        host = os.environ.get('DB_HOST','localhost'),
-        user = os.environ.get('DB_USER','root'),
-        password = os.environ.get('DB_PASSWORD','password'),
-        database = os.environ.get('DB_DATABASE','mc-nest')
+        host = os.environ.get('DB_HOST'),
+        user = os.environ.get('DB_USER'),
+        password = os.environ.get('DB_PASSWORD'),
+        database = os.environ.get('DB_DATABASE')
     )
 
     cursor = db.cursor(dictionary=True)

@@ -21,10 +21,10 @@ def get_market_prices():
 def save_results(results):
     try:
         db = mysql.connector.connect(
-            host = os.environ.get('DB_HOST','mc-db'),
-            user = os.environ.get('DB_USER','root'),
-            password = os.environ.get('DB_PASSWORD','password'),
-            database = os.environ.get('DB_DATABASE','mc_task')
+            host = os.environ.get('DB_HOST'),
+            user = os.environ.get('DB_USER'),
+            password = os.environ.get('DB_PASSWORD'),
+            database = os.environ.get('DB_DATABASE')
         )
         cursor = db.cursor()
         query = build_query(results)

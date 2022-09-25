@@ -1,4 +1,4 @@
-CREATE TABLE `quotes` if not exists (
+CREATE TABLE if not exists `quotes` (
   `id` int NOT NULL AUTO_INCREMENT,
   `exchange` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `pair` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE `quotes` if not exists (
   KEY (`modified_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `ranks` if not exists (
+CREATE TABLE if not exists  `ranks` (
   `id` int NOT NULL AUTO_INCREMENT,
   `exchange` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `pair` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
