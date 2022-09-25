@@ -17,6 +17,7 @@ services:
       - '9001:8080'
     volumes:
       - ./collector/lambda_function.py:/var/task/lambda_function.py
+      - ./collector/test_collector.py:/var/task/test_collector.py
     depends_on:
       - mc-db
 
@@ -36,6 +37,7 @@ services:
       - '9002:8080'
     volumes:
       - ./ranker/lambda_function.py:/var/task/lambda_function.py
+      - ./ranker/test_ranker.py:/var/task/test_ranker.py
     depends_on:
       - mc-db
 

@@ -26,6 +26,7 @@ EXTERNAL_API_RESPONSE = {
 }
 
 class MockCursor():
+    _affected_rows = 1
     def execute(query):
         return True
 
@@ -48,7 +49,9 @@ class TestCollector(unittest.TestCase):
 
     def test_save_results(self):        
         response = lambda_function.save_results(EXTERNAL_API_RESPONSE['result'])
-        self.assertTrue(response)
+        self.assertEqual(response.get('affected_rows'),1)
+        self.assertIn('insert_duration',response)
+
 
     def test_build_query(self):
         lambda_function.process_result = MagicMock(return_value = {
@@ -58,13 +61,13 @@ class TestCollector(unittest.TestCase):
         })
         response = lambda_function.build_query(EXTERNAL_API_RESPONSE['result'])
         lambda_function.process_result.assert_called()
-        self.assertEqual(response.count('''('exchange', 'pair', 1)'''), len(EXTERNAL_API_RESPONSE['result']))
+        self.assertEqual(response.count('''('exchange', 'pair', 1'''), len(EXTERNAL_API_RESPONSE['result']))
 
     def test_process_result(self):
         response = lambda_function.process_result('market:binance-us:1inchusd', 0.1)
-        print(response)
-
+        self.assertIn('exchange', response)
+        self.assertIn('pair', response)
+        self.assertIn('price', response)
 
 if __name__ == '__main__':
     unittest.main()
-        
