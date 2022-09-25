@@ -27,7 +27,7 @@ def lambda_handler(event, context):
 
 def get_pair_quotes(pair, exchange = DEFAULT_EXCHANGE):
   query = '''
-    select exchange, pair, price
+    select exchange, pair, price, unix_timestamp(created_at) as timestamp
     from quotes
     where exchange = '%s'
     and pair = '%s'
