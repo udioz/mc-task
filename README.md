@@ -107,6 +107,8 @@ Create the following AWS components (TODO: should be provisioned via Terraform):
     * Add one or more read replica
     * Considering to switch to a distributed no-sql DB such as DynamoDB
 
+- Also, the more I learn about Apache Spark the more convinced I am it can make life easier in this project as it scales. Although I haven't used it before, it seems like a good fit and I would definitely investigate and try it out. 
+
 ## Testing
 - Add negative scenarios
 - Add integration tests
